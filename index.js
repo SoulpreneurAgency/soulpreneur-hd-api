@@ -7,9 +7,10 @@ const app = express();
 // Middleware to parse JSON bodies
 app.use(express.json());
 
-// CORS configuration to allow requests from your domain
+// CORS configuration to allow requests from Custom GPT and your domain
 app.use(cors({
-  origin: 'https://soulpreneur-hd-api.onrender.com'
+  origin: ['https://soulpreneur-hd-api.onrender.com', 'https://chat.openai.com', 'https://chatgpt.com'],
+  credentials: true
 }));
 
 // Port configuration
@@ -25,21 +26,9 @@ app.post('/get-hd-data', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Missing required fields' });
     }
 
-    // Make request to external API
-    const response = await axios.post(
-      "https://api.bodygraphchart.com/v221096/hd-data",
-      {
-        birthDate: birth_date,
-        birthTime: birth_time,
-        birthPlace: birth_location
-      },
-      {
-        headers: {
-          "X-API-Key": process.env.API_KEY,
-          "Content-Type": "application/json",
-          "Origin": "https://soulpreneur-hd-api.onrender.com"
-        }
-      }
+    // Make request to external API using GET method with query parameters
+    const response = await axios.get(
+      `https://api.bodygraphchart.com/v221006/hd-data?api_key=${process.env.API_KEY}&date=${birth_date} ${birth_time}&timezone=Europe/London`
     );
 
     const chartData = response.data;
